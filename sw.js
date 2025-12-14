@@ -1,28 +1,25 @@
-//este es el service worker
-const CACHE_NAME = 'examen1-cache-v1';
-const ASSETS = [
-    './',
-    './index.html',
-    './app.js',
-    './manifest.json',
-    './images/icons/192.png',
-    './images/icons/512.png',
-    './sw.js',
-    './firebase-messaging-sw.js'
-]
+const CACHE_NAME = 'only-cache-v1';
 
-//INSTALACION
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
     console.log('Service Worker: Instalado');
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => { cache.addAll(ASSETS) })
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll([
+                './',
+                './index.html',
+                './app.js', 
+                './images/icons/192.png',
+                './images/icons/512.png',
+                './firebase-messaging-sw.js',
+                './sw.js',
+                './manifest.json'
+            ]);
+        })
     );
     self.skipWaiting();
 });
 
-//ACTIVACION
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
     console.log('Service Worker: Activado');
     event.waitUntil(
         caches.keys().then(keys =>
@@ -35,11 +32,8 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
-            .then(cachedResponse => {
-                return cachedResponse || fetch(event.request);
-            })
     );
 });
